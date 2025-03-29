@@ -1,103 +1,118 @@
-import Image from "next/image";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FaUser, FaLock } from "react-icons/fa";
+import axios from "axios";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const router = useRouter();
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "https://api.tripkolic.com/api/v1/task/login",
+        {
+          userId,
+          password,
+        }
+      );
+
+      if (response.data.status === true) {
+        router.push("/profile");
+      } else {
+        alert("Giriş başarısız. Lütfen bilgilerinizi kontrol edin.");
+      }
+    } catch (error) {
+      console.error("Login hatası:", error);
+      alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen  bg-gray-200  flex flex-col items-center justify-center p-8">
+      <form onSubmit={handleLogin} className="p-6 w-full max-w-md space-y-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 140 37"
+          className="w-[160px] m-auto mb-12"
+        >
+          <g fill="#EF9225" clipPath="url(#logo_svg__a)">
+            <path d="M41.034 17.42h-3.675v6.76q0 .846.423 1.236.422.39 1.235.439t2.017-.017v3.803q-4.325.487-6.098-.812-1.773-1.301-1.773-4.648v-6.76h-2.829V13.39h2.83v-3.283l4.195-1.268v4.55h3.675zm6.09-1.235q.585-1.56 1.935-2.34t3.008-.78v4.68q-1.919-.228-3.431.78t-1.512 3.348v7.768h-4.196V13.39h4.196zm8.138-4.453q-1.041 0-1.788-.747a2.44 2.44 0 0 1-.748-1.788q0-1.04.748-1.771a2.47 2.47 0 0 1 1.788-.732q1.008 0 1.757.748.747.747.748 1.755 0 1.04-.748 1.788-.749.747-1.757.747m-2.081 17.909V13.39h4.195V29.64zm16.172-16.706q3.285 0 5.61 2.486 2.325 2.488 2.325 6.094 0 3.608-2.325 6.095t-5.61 2.486q-3.415 0-5.269-2.373v8.419h-4.195V13.39h4.195v1.917q1.854-2.372 5.269-2.372m-4 11.88q1.267 1.283 3.219 1.283t3.236-1.284q1.284-1.283 1.285-3.299t-1.285-3.299q-1.284-1.284-3.236-1.283-1.95 0-3.22 1.283-1.268 1.284-1.268 3.3t1.269 3.298m28.562 4.826h-4.878l-5.92-7.383v7.383h-4.195V6.889h4.196v13.678l5.593-7.177h5.009l-6.537 8.028zm13.44-2.031q-2.505 2.486-6.114 2.486t-6.099-2.486q-2.487-2.487-2.487-6.095t2.487-6.094q2.49-2.486 6.099-2.486t6.114 2.486q2.504 2.488 2.504 6.094 0 3.608-2.504 6.095m-9.253-2.877q1.251 1.268 3.139 1.268 1.886 0 3.154-1.268t1.269-3.218q0-1.95-1.269-3.217t-3.154-1.268q-1.887 0-3.139 1.268-1.252 1.267-1.252 3.217t1.252 3.218m13.391 4.908V5.914h4.196v23.727zm8.789-17.909a2.44 2.44 0 0 1-1.788-.747 2.44 2.44 0 0 1-.748-1.788q0-1.04.748-1.771a2.47 2.47 0 0 1 1.788-.732q1.008 0 1.757.748.747.747.748 1.755 0 1.04-.748 1.788-.749.747-1.757.747m-2.081 17.909V13.39h4.196V29.64zm14.448.455q-3.674 0-6.131-2.47-2.454-2.47-2.455-6.11t2.455-6.111q2.457-2.47 6.131-2.47 2.374 0 4.325 1.137t2.96 3.056l-3.61 2.112a3.67 3.67 0 0 0-1.48-1.592q-.992-.585-2.227-.585-1.887 0-3.123 1.25-1.235 1.252-1.235 3.202 0 1.918 1.235 3.17 1.236 1.25 3.123 1.25 1.267 0 2.26-.568a3.6 3.6 0 0 0 1.479-1.576l3.643 2.08q-1.073 1.917-3.025 3.071t-4.325 1.154"></path>
+            <path
+              fillRule="evenodd"
+              d="m1.726 28.601 8.49.525C5.266 26.4 1.076 22.799.178 23.484c-.46.351-.057 1.826 1.548 5.117M1.487 21.49l9.015-.667C5.333 18.537 1.943 15.9.895 16.538c-.597.364-.435 1.791.592 4.953M3.014 14.208l8.204-3.05C7.078 8.914 5.283 7.445 4.395 7.65c-.89.204-.868 2.089-1.381 6.558M22.76 28.601l-8.49.525c4.95-2.726 9.14-6.327 10.038-5.642.46.351.057 1.826-1.548 5.117M12.244 30.619h.062c2.999-.022 5.988.144 6.615.579.37.257-.789.66-3.257 1.557-2.016.733-2.666 1.105-3.42 1.081-.754.025-1.404-.348-3.42-1.08-2.469-.898-3.628-1.3-3.257-1.558.627-.435 3.616-.601 6.614-.58zM23 21.49l-9.016-.667c5.17-2.286 8.56-4.923 9.608-4.285.597.364.434 1.791-.592 4.953M20.138 15.39c-4.955 2.953-6.425 4.429-7.895 4.429s-2.94-1.476-7.894-4.43c4.337-1.618 6.065-2.461 7.686-2.528a5 5 0 0 1 .416 0c1.621.067 3.35.91 7.686 2.529M21.474 14.208l-8.204-3.05c4.14-2.243 5.935-3.712 6.823-3.508.89.204.867 2.089 1.381 6.558M12.267 10.584c2.62-2.785 3.599-3.586 3.294-4.727-.258-.962-1.427-2.164-3.294-4.998l-.024.036L12.22.86c-1.867 2.834-3.036 4.036-3.293 4.998-.305 1.14.673 1.942 3.293 4.727l.024-.025zM12.243 27.996c-1.427 0-2.853-1.545-7.894-4.636 4.448-.702 6.11-1.075 7.597-1.119a10 10 0 0 1 .594 0c1.487.044 3.15.417 7.598 1.119-5.041 3.09-6.468 4.636-7.895 4.636"
+              clipRule="evenodd"
+            ></path>
+            <path
+              fillRule="evenodd"
+              d="M2.476 27.488c-.323-.685-.792-1.714-1.075-2.51.833.467 1.896 1.18 2.244 1.41q.986.65 1.973 1.294zM2.32 20.018c-.243-.806-.548-1.914-.61-2.571.739.264 2.028.975 2.394 1.172.693.375 1.38.748 2.071 1.113zM4.361 12.473c.079-.768.157-1.536.253-2.3.028-.23.11-.898.22-1.301.464.19 1.234.651 1.475.793q1.087.641 2.171 1.276zM22.011 27.488c.323-.685.791-1.714 1.074-2.51-.833.467-1.896 1.18-2.244 1.41q-.985.65-1.972 1.294zM16.68 31.547l-.372-.031a49 49 0 0 0-3.995-.109h-.134c-1.326-.01-2.673.01-3.995.109-.085.006-.216.016-.371.03q.661.243 1.322.481c.686.25 1.36.523 2.045.774.284.104.634.233.94.246q.062.003.126 0 .064.003.126 0c.306-.013.656-.142.94-.246.684-.25 1.36-.525 2.045-.774q.661-.239 1.322-.48M22.168 20.018c.242-.806.546-1.914.608-2.571-.738.264-2.027.975-2.393 1.172-.693.375-1.381.748-2.072 1.113zM17.53 15.63c-.88-.341-1.76-.68-2.645-.998-.768-.275-1.66-.581-2.482-.615a4 4 0 0 0-.32 0c-.823.034-1.714.34-2.482.615-.885.317-1.766.657-2.646.998q.603.379 1.201.765c.715.463 1.424.937 2.145 1.389.458.286 1.354.87 1.942.877.587-.007 1.484-.59 1.941-.877.722-.452 1.43-.926 2.146-1.389q.598-.386 1.2-.765M20.126 12.473c-.079-.768-.158-1.536-.253-2.3-.028-.23-.11-.898-.22-1.301-.464.19-1.234.651-1.475.793-.726.426-1.447.854-2.171 1.276zM12.243 9.228q.424-.442.843-.888c.344-.366.702-.745 1.008-1.142.13-.168.412-.502.348-.741-.106-.395-.625-1.088-.864-1.42-.448-.623-.896-1.238-1.335-1.861-.439.623-.886 1.238-1.334 1.86-.24.333-.759 1.026-.865 1.42-.063.24.218.574.348.742.307.397.665.776 1.008 1.142q.42.446.843.888M12.244 26.839c-.539-.005-1.489-.66-1.905-.935-.72-.476-1.43-.97-2.149-1.452q-.33-.222-.662-.44.957-.161 1.915-.316c.831-.134 1.696-.273 2.539-.298a9 9 0 0 1 .525 0c.843.025 1.707.164 2.539.298q.957.156 1.914.315l-.662.44c-.718.482-1.428.977-2.149 1.453-.416.275-1.366.93-1.905.935"
+              clipRule="evenodd"
+            ></path>
+          </g>
+          <defs>
+            <clipPath id="logo_svg__a">
+              <path fill="#fff" d="M0 .859h139.999v35.283H0z"></path>
+            </clipPath>
+          </defs>
+        </svg>
+
+        <h2 className="text-2xl font-bold text-center text-[#ef9225] mb-10">
+          LOG IN
+        </h2>
+
+        <div className="flex items-center border rounded px-3 py-2 bg-white">
+          <FaUser className="text-gray-400 mr-2" />
+          <input
+            type="text"
+            placeholder="User ID"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            className="w-full focus:outline-none"
+            required
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        <div className="flex items-center border rounded px-3 py-2 bg-white">
+          <FaLock className="text-gray-400 mr-2" />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full focus:outline-none"
+            required
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full cursor-pointer bg-[#ef9225] text-white py-2 rounded hover:bg-[#ef6c00] transition disabled:opacity-50"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {loading ? "Loading..." : "Log In"}
+        </button>
+      </form>
+      <div className="p-6 mx-12 w-full flex flex-col max-w-[400px] space-y-4 bg-white mt-12 rounded-2xl text-center">
+        <p className="text-[#ef9225]"> Register As</p>
+        <div className="flex flex-row justify-center gap-12">
+          <button className="w-28 bg-[#0288d1] px-4 py-2 rounded-2xl text-white cursor-pointer">
+            Operator
+          </button>
+          <button className="w-28 bg-[#0288d1] px-4 py-2 rounded-2xl text-white cursor-pointer">
+            Seller
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
